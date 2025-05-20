@@ -39,6 +39,7 @@ public class CausaController {
 	@PostMapping("/decision")
 	public Decision createDecision(@RequestBody Decision decision) {
 		// insert decision object into neo4j database
+		decision.neo4jLoader(driver);
 		return decision;
 	}
 }
