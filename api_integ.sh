@@ -1,0 +1,2 @@
+curl http://localhost:8080/test_decision | jq .  # /test_decision endpoint
+curl -d '{"lastModifiedTimestamp":"2025-05-20T16:13:16.140768100Z","proposition":"I sent an API request","rationale":[{"lastModifiedTimestamp":"2025-05-20T16:13:16.140773700Z","justification":"It is the best way to test my API"}]}' -H "Content-Type: application/json" -X POST http://localhost:8080/decision # /decision endpoint

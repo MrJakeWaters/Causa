@@ -7,13 +7,12 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.AuthTokens; 
 import org.neo4j.driver.GraphDatabase;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 
 public class Decision {
-	private Instant lastModifiedTimestamp;
+	private Instant decisionTimestamp;
 	private String proposition;
 	private Rationale[] rationale;
 
@@ -25,22 +24,9 @@ public class Decision {
 	public Decision(String proposition) {
 		this.proposition = proposition;
 		this.rationale = new Rationale[1];
-		setLastModifiedTimestamp();
+		setDecisionTimestamp();
 	}
 	
-	// loads decision object to Neo4j database
-	public void neo4jLoader(Driver driver) {
-		try {
-			ObjectMapper decision = new ObjectMapper().registerModule(new JavaTimeModule());
-			decision.writeValueAsString(this);
-			String statement = String.format("CREATE (n:%s {data: $data})", this.getClass().getSimpleName());
-			driver.session().run(statement, Values.parameters("data", decision));
-			System.out.println("Decision Successfully Loaded to Neo4j Database");
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
 	public void addRationale(String justification) {
 		if (this.rationale.length == 0) {
 			this.rationale[0] = new Rationale(justification);	
@@ -53,8 +39,8 @@ public class Decision {
 		System.out.println(this.rationale.length);
 	}
 
-	public Instant getLastModifiedTimestamp() {
-		return this.lastModifiedTimestamp;
+	public Instant getDecisionTimestamp() {
+		return this.decisionTimestamp;
 	}
 
 	public String getProposition() {
@@ -65,16 +51,12 @@ public class Decision {
 		return this.rationale;
 	}
 
-	public void setLastModifiedTimestamp() {
-		this.lastModifiedTimestamp = Instant.now();
+	public void setDecisionTimestamp() {
+		this.decisionTimestamp = Instant.now();
 	}
 
 	public void setProposition(String proposition) {
 		this.proposition = proposition;
-	}
-
-	public void setRationale(Rationale[] rationale) {
-		this.rationale = rationale;
 	}
 
 }

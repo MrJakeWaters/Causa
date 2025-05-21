@@ -32,14 +32,14 @@ public class CausaController {
 	@GetMapping("/test_decision")
 	public Decision createTestDecision() {
 		Decision decision = new Decision("I sent an API request");
-		decision.addRationale("It's the best way to test my API");
+		decision.addRationale("It is the best way to test my API");
 		return decision;
 	}
 
 	@PostMapping("/decision")
 	public Decision createDecision(@RequestBody Decision decision) {
 		// insert decision object into neo4j database
-		decision.neo4jLoader(driver);
+		Neo4jLoader loader = new Neo4jLoader(decision);
 		return decision;
 	}
 }

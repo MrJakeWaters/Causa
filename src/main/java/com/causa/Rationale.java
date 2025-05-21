@@ -3,7 +3,7 @@ package com.causa;
 import java.time.Instant;
 
 public class Rationale {
-	private Instant lastModifiedTimestamp;
+	private Instant rationaleTimestamp;
 	private String justification;
 
 	// constructor to be able to parse api put request
@@ -13,19 +13,19 @@ public class Rationale {
 	// contstructor
 	public Rationale(String justification) {
 		this.justification = justification;
-		setLastModifiedTimestamp();
+		setRationaleTimestamp();
 	}
 	
-	public Instant getLastModifiedTimestamp() {
-		return this.lastModifiedTimestamp;
+	public Instant getRationaleTimestamp() {
+		return this.rationaleTimestamp;
 	}
 
 	public String getJustification() {
 		return this.justification;
 	}
 
-	public void setLastModifiedTimestamp() {
-		this.lastModifiedTimestamp = Instant.now();
+	public void setRationaleTimestamp() {
+		this.rationaleTimestamp = Instant.now();
 	}
 
 	public void setJustification(String justification) {
