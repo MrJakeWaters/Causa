@@ -1,5 +1,6 @@
 package com.causa;
 
+import java.lang.reflect.Field;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.Driver; 
 import org.neo4j.driver.AuthTokens; 
@@ -10,30 +11,26 @@ public class Neo4jLoader<Generic> {
 	private final String dbUser = "neo4j";
 	private final String dbPassword = "2USA0UKeiuIhJvLzyXS6I9i4rJY8zjKtq6IfWAS40fg";	
 	private final Driver driver;
-	private Generic content;
 	
-	public Neo4jLoader(Generic content) {
-		this.content = content;
+	public Neo4jLoader() {
 		this.driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
 	}
 	
 	// loads decision object to Neo4j database
-	public void neo4jLoader(Driver driver, String[] attributes) {
+	public void saveObject(Decision content) {
+		// create object Neo4j statement
+		// CREATE (carCategory:Category {name: 'Car'})
 		try {
 			String stmtAttributes = "{";
-			for (String attribute: attributes) {
-				stmtAttributes = String.format("%s%s: $%s,", stmtAttributes, attribute, this.content.getAttributeName());
+			for (Field attribute: content.getClass().getDeclaredFields()) {
+				attribute.setAccessible(true);
+				stmtAttributes = String.format("%s%s: $%s,", stmtAttributes, attribute.getName(), attribute.getName());
 			} 
-			// need to remove the final "," from the string and close the object bracket
-			stmtAttributes = stmtAttributes.substring(0, stmtAttributes.length-2) + "}";
-			String statement = String.format("CREATE (n:%s %s)", this.content.getClass().getSimpleName(), stmtAttributes);
-			driver.session().run(statement, Values.parameters("proposition", this.proposition, "decisionTimestamp", this.decisionTimestamp.toString()));
-			driver.session().close();
-			System.out.println("Decision Successfully Loaded to Neo4j Database");
+			stmtAttributes = stmtAttributes.substring(0, stmtAttributes.length()-1) + "}";
+			String statement = String.format("CREATE (n:%s %s)", content.getClass().getSimpleName(), stmtAttributes);
+			System.out.println(statement);
 		} catch (Exception e) {
-			System.out.println(e);
-			driver.session().close();
+			e.printStackTrace();	
 		}
-		
 	}
 }

@@ -1,9 +1,10 @@
 package com.causa;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 public class Rationale {
-	private Instant rationaleTimestamp;
+	private String rationaleTimestamp;
 	private String justification;
 
 	// constructor to be able to parse api put request
@@ -16,7 +17,7 @@ public class Rationale {
 		setRationaleTimestamp();
 	}
 	
-	public Instant getRationaleTimestamp() {
+	public String getRationaleTimestamp() {
 		return this.rationaleTimestamp;
 	}
 
@@ -25,7 +26,7 @@ public class Rationale {
 	}
 
 	public void setRationaleTimestamp() {
-		this.rationaleTimestamp = Instant.now();
+		this.rationaleTimestamp = Instant.now().toString();
 	}
 
 	public void setJustification(String justification) {
