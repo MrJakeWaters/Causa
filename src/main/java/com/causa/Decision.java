@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Decision {
 	private String decisionTimestamp;
+	private String entity = "Server"; 
 	private String proposition;
 
 	// constructor to be able to parse api put request
@@ -25,16 +26,27 @@ public class Decision {
 		setDecisionTimestamp();
 	}
 	
+	// getter and setter of decisionTimestamp
 	public String getDecisionTimestamp() {
 		return this.decisionTimestamp;
 	}
-
-	public String getProposition() {
-		return this.proposition;
-	}
-
+	
 	public void setDecisionTimestamp() {
 		this.decisionTimestamp = Instant.now().toString();
+	}
+
+	// getter and setter of entity
+	public String getEntity() {
+		return this.entity;
+	}
+
+	public void setEntity(String entity) {
+		this.entity = entity;
+	}
+
+	// getter and setter of proposition
+	public String getProposition() {
+		return this.proposition;
 	}
 
 	public void setProposition(String proposition) {

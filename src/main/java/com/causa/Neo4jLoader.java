@@ -1,36 +1,56 @@
 package com.causa;
 
-import java.lang.reflect.Field;
-import org.neo4j.driver.Values;
 import org.neo4j.driver.Driver; 
 import org.neo4j.driver.AuthTokens; 
 import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.exceptions.*;
 
 public class Neo4jLoader<Generic> {
+	// static attributes
 	private final String dbUri = "neo4j+s://cf5a6658.databases.neo4j.io";
 	private final String dbUser = "neo4j";
 	private final String dbPassword = "2USA0UKeiuIhJvLzyXS6I9i4rJY8zjKtq6IfWAS40fg";	
 	private final Driver driver;
+	private String statement;
 	
 	public Neo4jLoader() {
 		this.driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
 	}
 	
+	public String getStatement() {
+		return this.statement;
+	}
+
 	// loads decision object to Neo4j database
-	public void saveObject(Decision content) {
-		// create object Neo4j statement
-		// CREATE (carCategory:Category {name: 'Car'})
+	public void saveObject(Decision decision) {
+		// converts object to json string, generates Neo4j insert statement to load to Database
+		// Neo4j SQL statement Example: CREATE (carCategory:Category {name: 'Car'})
+		Neo4jAbstract neo4jAbstract = new Neo4jAbstract(decision);
 		try {
-			String stmtAttributes = "{";
-			for (Field attribute: content.getClass().getDeclaredFields()) {
-				attribute.setAccessible(true);
-				stmtAttributes = String.format("%s%s: $%s,", stmtAttributes, attribute.getName(), attribute.getName());
-			} 
-			stmtAttributes = stmtAttributes.substring(0, stmtAttributes.length()-1) + "}";
-			String statement = String.format("CREATE (n:%s %s)", content.getClass().getSimpleName(), stmtAttributes);
-			System.out.println(statement);
-		} catch (Exception e) {
-			e.printStackTrace();	
+			this.statement = String.format("CREATE %s", neo4jAbstract.getStr());
+			System.out.println(this.statement);
+			this.driver.session().run(this.statement);
+			this.driver.session().close();
+		} catch (Neo4jException e) {
+			System.out.println(String.format("%s node already exists", neo4jAbstract.getName()));
+		}
+	}
+
+	// load decision with rationale
+	public void saveObject(Decision decision, Rationale rationale) {
+		// converts object to json string, generates Neo4j insert statement to load to Database
+		// Neo4j SQL statement Example: CREATE (carCategory:Category {name: 'Car'})
+		Neo4jAbstract decisionAbstract = new Neo4jAbstract(decision);
+		Neo4jAbstract rationaleAbstract = new Neo4jAbstract(rationale);
+		String relationship = "MATCH (d:Decision),(r:Rationale) where r.proposition = d.proposition and r.entity = d.entity create (d)-[:BECAUSE] ->(r)";
+		try {
+			this.statement = String.format("CREATE %s,%s", decisionAbstract.getStr(), rationaleAbstract.getStr());
+			System.out.println(this.statement);
+			this.driver.session().run(this.statement);
+			this.driver.session().run(relationship);
+			this.driver.session().close();
+		} catch (Neo4jException e) {
+			e.getMessage();
 		}
 	}
 }
