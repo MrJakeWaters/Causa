@@ -13,36 +13,36 @@ import org.springframework.web.bind.annotation.RestController;
 @ResponseBody
 public class CausaController {
 	
-	private final String dbUri = "neo4j+s://cf5a6658.databases.neo4j.io";
-	private final String dbUser = "neo4j";
-	private final String dbPassword = "2USA0UKeiuIhJvLzyXS6I9i4rJY8zjKtq6IfWAS40fg";	
-	private final Driver driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
+	private final Neo4jLoader loader = new Neo4jLoader();
 	
 	@GetMapping("/hello")
 	public String whatUp() {
 		return "What Up from Causa API\n";
 	}
 	
-	@GetMapping("/connection")
-	public String verifyDatabaseConnection() {
-		driver.verifyConnectivity();
-		return "Database Connection Working\n";
-	}
-	
-	@GetMapping("/test_decision")
-	public Rationale createTestDecision() {
-		Decision decision = new Decision("I sent an API request");
+	@GetMapping("/database_insert_test")
+	public Neo4jAbstract[] createTestDecision() {
+		// create decision
+		Decision decision = new Decision("Today on 6/1/2025 I sent an API request");
 		decision.setEntity("Jake");
-		Rationale rationale = new Rationale("It is the best way to test my API");
+
+		// create rationale
+		Rationale rationale = new Rationale("I am testing out the code for the new project");
 		rationale.decisionAttacher(decision);
-		Neo4jLoader loader = new Neo4jLoader();
-		loader.saveObject(decision, rationale);
-		return rationale;
+
+		// save to Neo4j and return abstracts of saved objects
+		Neo4jAbstract[] abstracts = new Neo4jAbstract[2];
+		abstracts = loader.saveObject(decision, rationale);	
+		return abstracts;
 	}
 
-	@PostMapping("/decision")
-	public Decision createDecision(@RequestBody Decision decision) {
-		// insert decision object into neo4j database
+	@PostMapping("/create_decision")
+	public ApiDecision createDecision(@RequestBody ApiDecision decision) {
+		// set timestamps
+		decision.setDecisionTimestamp();
+		for (ApiRationale r: decision.getRationale()) {
+			r.setRationaleTimestamp();
+		} 
 		return decision;
 	}
 }

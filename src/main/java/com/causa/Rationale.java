@@ -1,7 +1,6 @@
 package com.causa;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 public class Rationale {
 	private String rationaleTimestamp;
@@ -60,4 +59,3 @@ public class Rationale {
 		this.proposition = proposition;
 	}
 }
-

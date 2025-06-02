@@ -13,8 +13,11 @@ public class Neo4jLoader<Generic> {
 	private final Driver driver;
 	private String statement;
 	
+	// constructor
 	public Neo4jLoader() {
 		this.driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
+		this.driver.verifyConnectivity();
+		System.out.println("Neo4j Database Connection Working\n");
 	}
 	
 	public String getStatement() {
@@ -33,24 +36,34 @@ public class Neo4jLoader<Generic> {
 			this.driver.session().close();
 		} catch (Neo4jException e) {
 			System.out.println(String.format("%s node already exists", neo4jAbstract.getName()));
+			this.driver.session().close();
 		}
 	}
 
 	// load decision with rationale
-	public void saveObject(Decision decision, Rationale rationale) {
+	public Neo4jAbstract[] saveObject(Decision decision, Rationale rationale) {
 		// converts object to json string, generates Neo4j insert statement to load to Database
 		// Neo4j SQL statement Example: CREATE (carCategory:Category {name: 'Car'})
 		Neo4jAbstract decisionAbstract = new Neo4jAbstract(decision);
 		Neo4jAbstract rationaleAbstract = new Neo4jAbstract(rationale);
 		String relationship = "MATCH (d:Decision),(r:Rationale) where r.proposition = d.proposition and r.entity = d.entity create (d)-[:BECAUSE] ->(r)";
+		Neo4jAbstract[] saveObjects = {decisionAbstract, rationaleAbstract};
 		try {
 			this.statement = String.format("CREATE %s,%s", decisionAbstract.getStr(), rationaleAbstract.getStr());
 			System.out.println(this.statement);
+
+			// execute statements to create object and relationship
 			this.driver.session().run(this.statement);
+			decisionAbstract.setLoadStatus(true);
+			rationaleAbstract.setLoadStatus(true);
 			this.driver.session().run(relationship);
+
+			// close session
 			this.driver.session().close();
 		} catch (Neo4jException e) {
 			e.getMessage();
+			this.driver.session().close();
 		}
+		return saveObjects;
 	}
 }
