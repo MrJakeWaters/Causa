@@ -1,5 +1,8 @@
 package com.causa;
 
+// external
+import java.util.List;
+import java.util.ArrayList;
 import org.neo4j.driver.Driver; 
 import org.neo4j.driver.AuthTokens; 
 import org.neo4j.driver.GraphDatabase;
@@ -20,29 +23,13 @@ public class CausaController {
 		return "What Up from Causa API\n";
 	}
 	
-	@GetMapping("/database_insert_test")
-	public Neo4jAbstract[] createTestDecision() {
-		// create decision
-		Decision decision = new Decision("Today on 6/1/2025 I sent an API request");
-		decision.setEntity("Jake");
-
-		// create rationale
-		Rationale rationale = new Rationale("I am testing out the code for the new project");
-		rationale.decisionAttacher(decision);
-
-		// save to Neo4j and return abstracts of saved objects
-		Neo4jAbstract[] abstracts = new Neo4jAbstract[2];
-		abstracts = loader.saveObject(decision, rationale);	
-		return abstracts;
-	}
-
 	@PostMapping("/create_decision")
-	public ApiDecision createDecision(@RequestBody ApiDecision decision) {
-		// set timestamps
-		decision.setDecisionTimestamp();
-		for (ApiRationale r: decision.getRationale()) {
+	public List<Neo4jAbstract> createDecision(@RequestBody ApiDecision apiDecision) {
+		apiDecision.setDecisionTimestamp();
+		for (ApiRationale r: apiDecision.getRationale()) {
 			r.setRationaleTimestamp();
 		} 
-		return decision;
+		List<Neo4jAbstract> objects = loader.saveObject(apiDecision, true);
+		return objects;
 	}
 }
