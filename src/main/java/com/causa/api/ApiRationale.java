@@ -9,6 +9,7 @@ public class ApiRationale {
 	public ApiRationale() {}
 	public ApiRationale(String justification) {
 		this.justification = justification;
+		setRationaleTimestamp();
 	}
 
 	// justification

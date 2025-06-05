@@ -21,6 +21,7 @@ public class ApiDecision {
 			rationale.setRationaleTimestamp();
 			this.rationale.add(rationale);
 		}
+		setDecisionTimestamp();
 	}
 
 	// decisionTimestamp

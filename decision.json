@@ -1,15 +1,12 @@
 {
-  "proposition": "I sent an API request",
-  "entity": "Jake",
+  "proposition": "I ran a unit test",
+  "entity": "Unit Tester",
   "rationale": [
     {
-      "justification": "It is the best way to test my API"
+      "justification": "to validate the code runs properly"
     },
     {
-      "justification": "It is a good way to learn java"
-    },
-    {
-      "justification": "It will be good resume experience"
+      "justification": "improve stability of changes to the codebase"
     }
   ]
 }

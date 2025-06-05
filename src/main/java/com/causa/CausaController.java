@@ -24,12 +24,12 @@ public class CausaController {
 	}
 	
 	@PostMapping("/create_decision")
-	public List<Neo4jAbstract> createDecision(@RequestBody ApiDecision apiDecision) {
+	public String createDecision(@RequestBody ApiDecision apiDecision) {
 		apiDecision.setDecisionTimestamp();
 		for (ApiRationale r: apiDecision.getRationale()) {
 			r.setRationaleTimestamp();
 		} 
-		List<Neo4jAbstract> objects = loader.saveObject(apiDecision, true);
-		return objects;
+		String query = loader.saveObject(apiDecision, false);
+		return query;
 	}
 }

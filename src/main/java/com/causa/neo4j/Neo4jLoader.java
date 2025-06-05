@@ -27,7 +27,7 @@ public class Neo4jLoader<Generic> {
 	}
 	
 	// load api decision with rationale
-	public List<Neo4jAbstract> saveObject(ApiDecision apiDecision, boolean display) {
+	public String saveObject(ApiDecision apiDecision, boolean display) {
 		// converts object to json string, generates Neo4j insert statement to load to Database
 		// Neo4j SQL statement Example: CREATE (carCategory:Category {name: 'Car'})
 		int n = 0;
@@ -45,30 +45,24 @@ public class Neo4jLoader<Generic> {
 
 		// create query to execute for decision object
 		String query = "";
-		String createObjects = "";
 		Map<String, Object> map = new HashMap<>();
 		for (Neo4jAbstract object: objects) {
 			map.putAll(object.getMap());
 			query = String.format("%s%s\n", query, object.getStr());
+			
+			// generate relationship statement
 			if (objects.get(0) != object) {
+				// this adds an extra character to the end of the string
 				query = query + String.format("CREATE (%s)-[:BECAUSE]-> (%s)\n",  objects.get(0).getAlias(), object.getAlias());
 			}
 		}
+		query = query.trim();
 		
 		// show query if desired
 		if (display == true) {
 			System.out.println(query);
 		}
 		// execute query
-		/*  Ex.
-			CREATE (d0:Decision {proposition:$proposition0,entity:$entity0,decisionTimestamp:$decisionTimestamp0})
-			CREATE (r0:Rationale {rationaleTimestamp:$rationaleTimestamp0,justification:$justification0})
-			CREATE (d0)-[:BECAUSE]->(r0)
-			CREATE (r1:Rationale {rationaleTimestamp:$rationaleTimestamp1,justification:$justification1})
-			CREATE (d0)-[:BECAUSE]->(r1)
-			CREATE (r2:Rationale {rationaleTimestamp:$rationaleTimestamp2,justification:$justification2})	
-			CREATE (d0)-[:BECAUSE]->(r2)
-		*/
 		try {
 			this.driver.executableQuery(query).withParameters(map).execute();
 		} catch (Neo4jException e) {
@@ -77,6 +71,6 @@ public class Neo4jLoader<Generic> {
 		
 		// close session
 		this.driver.session().close();
-		return objects;
+		return query;
 	}
 }
