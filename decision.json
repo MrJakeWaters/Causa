@@ -1,12 +1,4 @@
 {
   "proposition": "I ran a unit test",
-  "entity": "Unit Tester",
-  "rationale": [
-    {
-      "justification": "to validate the code runs properly"
-    },
-    {
-      "justification": "improve stability of changes to the codebase"
-    }
-  ]
+  "entity": "Unit Tester"
 }

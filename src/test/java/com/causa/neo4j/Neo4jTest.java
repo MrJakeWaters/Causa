@@ -10,10 +10,10 @@ import java.lang.StackWalker;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Neo4jLoaderTest {
+public class Neo4jTest {
 	@Test
-	public void testSaveObjectQueryString() {
-		Neo4jLoader loader = new Neo4jLoader();
+	public void testSaveDecisionWithMultipleRationaleQueryString() {
+		Neo4j loader = new Neo4j();
 		String methodName = StackWalker.getInstance()
 			.walk(frames -> frames.findFirst()
 			.map(StackWalker.StackFrame::getMethodName)
@@ -28,22 +28,27 @@ public class Neo4jLoaderTest {
 
 		// create decision object and attempt to save to DB
 		// all units tests will be saved to DB if successfull
-		ApiDecision decision = new ApiDecision(proposition, entity, rationale);
+		ApiDecision decision = new ApiDecision(proposition, entity);
+		decision.setRationale(rationale);
 		String query = loader.saveObject(decision, false);
 		assertEquals(result, query);
 	}
-	public void testSaveObjectLoadedToDatabase() {
-		Neo4jLoader loader = new Neo4jLoader();
+
+	@Test
+	public void testSaveDecisionWithNoRationaleQueryString() {
+		Neo4j loader = new Neo4j();
 		String methodName = StackWalker.getInstance()
 			.walk(frames -> frames.findFirst()
 			.map(StackWalker.StackFrame::getMethodName)
 			.orElse("unknown"));
 		String proposition = String.format("Executed Unit Test %s", UUID.randomUUID().toString());
 		String entity = String.format("Unit Test: %s", methodName);
-		List<String> rationale = Arrays.asList(
-			"ensuring data is being loaded to neo4j"
-		);
-		ApiDecision decision = new ApiDecision(proposition, entity, rationale);
+		String result = "CREATE (d0:Decision {proposition:$proposition0,entity:$entity0,decisionTimestamp:$decisionTimestamp0})";
+
+		// create decision object and attempt to save to DB
+		// all units tests will be saved to DB if successfull
+		ApiDecision decision = new ApiDecision(proposition, entity);
 		String query = loader.saveObject(decision, false);
+		assertEquals(result, query);
 	}
 }

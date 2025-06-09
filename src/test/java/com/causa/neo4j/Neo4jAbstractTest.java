@@ -19,7 +19,8 @@ public class Neo4jAbstractTest {
 			"to validate the code runs properly", 
 			"improve stability of changes to the codebase"
 		);
-		ApiDecision decision = new ApiDecision(proposition, entity, rationale);
+		ApiDecision decision = new ApiDecision(proposition, entity);
+		decision.setRationale(rationale);
 		Neo4jAbstract na = new Neo4jAbstract(decision, 0);
 	}
 }

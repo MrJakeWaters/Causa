@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ResponseBody
 public class CausaController {
 	
-	private final Neo4jLoader loader = new Neo4jLoader();
+	private final Neo4j neo4j = new Neo4j();
 	
 	@GetMapping("/hello")
 	public String whatUp() {
@@ -29,7 +29,13 @@ public class CausaController {
 		for (ApiRationale r: apiDecision.getRationale()) {
 			r.setRationaleTimestamp();
 		} 
-		String query = loader.saveObject(apiDecision, false);
+		String query = neo4j.saveObject(apiDecision, false);
 		return query;
+	}
+
+	@GetMapping("/get_decisions")
+	public String getDecisions() {
+		neo4j.getDecisions();
+		return "Getting decisions from database\n";
 	}
 }

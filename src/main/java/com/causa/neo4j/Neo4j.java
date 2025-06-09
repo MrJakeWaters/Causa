@@ -4,28 +4,47 @@ package com.causa;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
+import org.neo4j.driver.*;
 import java.util.ArrayList;
 import org.neo4j.driver.Driver; 
+import java.lang.reflect.Method;
 import org.neo4j.driver.AuthTokens; 
 import org.neo4j.driver.exceptions.*;
 import org.neo4j.driver.GraphDatabase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public class Neo4jLoader<Generic> {
+public class Neo4j<Generic> {
 	// static attributes
 	private final String dbUri = "neo4j+s://cf5a6658.databases.neo4j.io";
 	private final String dbUser = "neo4j";
-	private final String dbPassword = "2USA0UKeiuIhJvLzyXS6I9i4rJY8zjKtq6IfWAS40fg";	
+	private final String dbPassword = "jGiDtd1DvPnCL47dSE3LHIymIcLm0JITdNTT6Fun8qU";	
 	private final Driver driver;
 	
 	// constructor
-	public Neo4jLoader() {
+	public Neo4j() {
 		this.driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
 		this.driver.verifyConnectivity();
 		System.out.println("Neo4j Database Connection Working\n");
 	}
 	
+	public void getDecisions() {
+		String query = "match (decision:Decision) optional match (decion:Decision)-[relationship:BECAUSE]->(rationale:Rationale) return decision, rationale, relationship";
+		var results = this.driver.executableQuery(query).execute();
+		for (var record: results.records()) {
+			var decision = record.get("decision").asNode();
+			var rationale = record.get("rationale").asNode();
+			var relationship = record.get("relationship");
+
+			// display results
+			System.out.println(decision.asMap());
+			System.out.println(rationale.asMap());
+			System.out.println(relationship.asRelationship().getClass());
+			System.out.println(relationship.asRelationship().startNodeId());
+			System.out.println(relationship.asRelationship().startNodeElementId());
+		}
+	}
+
 	// load api decision with rationale
 	public String saveObject(ApiDecision apiDecision, boolean display) {
 		// converts object to json string, generates Neo4j insert statement to load to Database

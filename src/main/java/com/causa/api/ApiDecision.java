@@ -13,14 +13,9 @@ public class ApiDecision {
 
 	public ApiDecision() {}
 
-	public ApiDecision(String proposition, String entity, List<String> justifications) {
+	public ApiDecision(String proposition, String entity) {
 		this.proposition = proposition;
 		this.entity = entity;
-		for (String justification: justifications) {
-			ApiRationale rationale = new ApiRationale(justification);
-			rationale.setRationaleTimestamp();
-			this.rationale.add(rationale);
-		}
 		setDecisionTimestamp();
 	}
 
@@ -52,7 +47,11 @@ public class ApiDecision {
 	public List<ApiRationale> getRationale() {
 		return this.rationale;
 	}
-	public void setRationale(List<ApiRationale> rationale) {
-		this.rationale = rationale;
+	public void setRationale(List<String> justifications) {
+		for (String justification: justifications) {
+			ApiRationale rationale = new ApiRationale(justification);
+			rationale.setRationaleTimestamp();
+			this.rationale.add(rationale);
+		}
 	}
 }
