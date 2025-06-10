@@ -2,21 +2,17 @@ package com.causa;
 
 // external
 import java.util.List;
-import java.util.ArrayList;
-import org.neo4j.driver.Driver; 
-import org.neo4j.driver.AuthTokens; 
-import org.neo4j.driver.GraphDatabase;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @ResponseBody
 public class CausaController {
-	
-	private final Neo4j neo4j = new Neo4j();
 	
 	@GetMapping("/hello")
 	public String whatUp() {
@@ -25,17 +21,8 @@ public class CausaController {
 	
 	@PostMapping("/create_decision")
 	public String createDecision(@RequestBody ApiDecision apiDecision) {
-		apiDecision.setDecisionTimestamp();
-		for (ApiRationale r: apiDecision.getRationale()) {
-			r.setRationaleTimestamp();
-		} 
-		String query = neo4j.saveObject(apiDecision, false);
-		return query;
-	}
-
-	@GetMapping("/get_decisions")
-	public String getDecisions() {
-		neo4j.getDecisions();
-		return "Getting decisions from database\n";
+		// https://www.elastic.co/docs/reference/elasticsearch/clients/java/transport/rest-client/usage/requests
+		RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200)).build();
+		return "Testing";
 	}
 }
