@@ -9,7 +9,7 @@ public class ApiDecision {
 	private String decisionTimestamp; 
 	private String proposition;
 	private String entity;
-	private List<ApiRationale> rationale = new ArrayList<>();
+	private List<Rationale> rationale = new ArrayList<>();
 
 	public ApiDecision() {}
 
@@ -44,12 +44,12 @@ public class ApiDecision {
 	}
 
 	// rationale
-	public List<ApiRationale> getRationale() {
+	public List<Rationale> getRationale() {
 		return this.rationale;
 	}
 	public void setRationale(List<String> justifications) {
 		for (String justification: justifications) {
-			ApiRationale rationale = new ApiRationale(justification);
+			Rationale rationale = new Rationale(justification);
 			rationale.setRationaleTimestamp();
 			this.rationale.add(rationale);
 		}

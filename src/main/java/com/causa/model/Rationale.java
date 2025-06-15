@@ -2,12 +2,12 @@ package com.causa;
 
 import java.time.Instant;
 
-public class ApiRationale {
+public class Rationale {
 	private String justification;
 	private String rationaleTimestamp;
 	
-	public ApiRationale() {}
-	public ApiRationale(String justification) {
+	public Rationale() {}
+	public Rationale(String justification) {
 		this.justification = justification;
 		setRationaleTimestamp();
 	}
