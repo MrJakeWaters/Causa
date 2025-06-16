@@ -39,4 +39,16 @@ public class WeaviateAbstract {
 		Result<ObjectGetResponse[]> batchResult = batch.run();
 		return batchResult;
 	}
+
+	public Result<ObjectGetResponse[]> batchLoad(Rationale rationale) {
+		Abstract objAbstract = new Abstract(decision);
+		WeaviateObject obj = WeaviateObject.builder()
+			.className(objAbstract.getName())
+			.properties(objAbstract.getMap())
+			.build();			
+		ObjectsBatcher batch = client.batch().objectsBatcher();
+		batch.withObjects(obj);
+		Result<ObjectGetResponse[]> batchResult = batch.run();
+		return batchResult;
+	}
 }

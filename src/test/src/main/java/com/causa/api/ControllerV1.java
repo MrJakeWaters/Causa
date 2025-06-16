@@ -2,14 +2,8 @@ package com.causa;
 
 import java.net.URI;
 import java.util.List;
-import io.weaviate.client.Config;
 import io.weaviate.client.base.Result;
-import io.weaviate.client.WeaviateClient;
-import io.weaviate.client.v1.batch.Batch;
-import io.weaviate.client.v1.misc.model.Meta;
-import io.weaviate.client.v1.batch.api.ObjectsBatcher;
-import io.weaviate.client.v1.batch.api.ObjectsBatcher;
-import io.weaviate.client.v1.data.model.WeaviateObject;
+import io.weaviate.client.base.WeaviateErrorMessage;
 import org.springframework.web.bind.annotation.GetMapping;
 import io.weaviate.client.v1.batch.model.ObjectGetResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,29 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/v1")
 public class ControllerV1 {
 
+	private final WeaviateAbstract db = new WeaviateAbstract("localhost:8081");
+
 	@GetMapping("/hello")
 	public String whatUp() {
 		return "What Up from Causa API\n";
 	}
 	
 	@PostMapping("/create_decision")
-	public String createDecision(@RequestBody ApiDecision apiDecision) {
+	public Result<ObjectGetResponse[]> createDecision(@RequestBody ApiDecision apiDecision) {
 		Decision decision = new Decision(apiDecision.getProposition(), apiDecision.getEntity());
-		Abstract decisionAbstract = new Abstract(decision);
-		Config config = new Config("http", "localhost:8081");
-		WeaviateClient client = new WeaviateClient(config);
-		ObjectsBatcher batch = client.batch().objectsBatcher();
-		WeaviateObject obj = WeaviateObject.builder()
-			.className(decisionAbstract.getName())
-			.properties(decisionAbstract.getMap())
-			.build();			
-		batch.withObjects(obj);
-		Result<ObjectGetResponse[]> batchResult = batch.run();
-		if (batchResult.hasErrors()) {
+		Result<ObjectGetResponse[]> results = db.batchLoad(decision);
+		if (results.hasErrors()) {
+			results.toErrorResult();
 			System.out.println("Batch import errors");
+			for (WeaviateErrorMessage message: results.getError().getMessages()) {
+				System.out.println(message.getMessage());
+			}
 		} else {
 			System.out.println("Import Success");
 		}
-		return "You get to decide\n";
+		return results;
 	}
 }
